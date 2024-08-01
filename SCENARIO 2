@@ -1,0 +1,124 @@
+abstract class BankAccount {
+    private String accountNumber;
+    protected double balance;
+    protected String accountType;
+
+    public BankAccount(String accountNumber, double balance) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Deposited: $" + amount);
+        } else {
+            System.out.println("Invalid deposit amount");
+        }
+    }
+
+    public abstract void withdraw(double amount);
+
+    public void viewBalance() {
+        System.out.println("Account Number: " + accountNumber);
+        System.out.println("Account Type: " + accountType);
+        System.out.println("Balance: $" + balance);
+    }
+}
+
+class SavingsAccount extends BankAccount {
+    private static final double INTEREST_RATE = 0.04;
+
+    public SavingsAccount(String accountNumber, double balance) {
+        super(accountNumber, balance);
+        this.accountType = "Savings";
+    }
+
+    public void applyMonthlyInterest() {
+        balance += balance * INTEREST_RATE;
+        System.out.println("Monthly interest applied");
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrew: $" + amount);
+        } else {
+            System.out.println("Invalid or insufficient funds for withdrawal");
+        }
+    }
+}
+
+class CheckingAccount extends BankAccount {
+    private static final double MINIMUM_BALANCE = 500;
+    private static final double FEE = 50;
+
+    public CheckingAccount(String accountNumber, double balance) {
+        super(accountNumber, balance);
+        this.accountType = "Checking";
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrew: $" + amount);
+            if (balance < MINIMUM_BALANCE) {
+                balance -= FEE;
+                System.out.println("Balance below minimum. Fee charged: $" + FEE);
+            }
+        } else {
+            System.out.println("Invalid or insufficient funds for withdrawal");
+        }
+    }
+}
+
+public class BankAccountManagementSystem {
+    public static void main(String[] args) {
+        SavingsAccount savingsAccount = new SavingsAccount("S123", 1000);
+        savingsAccount.viewBalance();
+        savingsAccount.deposit(500);
+        savingsAccount.viewBalance();
+        CheckingAccount checkingAccount = new CheckingAccount("C123", 600);
+        checkingAccount.viewBalance();
+        checkingAccount.withdraw(200);
+        checkingAccount.viewBalance();
+        savingsAccount.applyMonthlyInterest();
+        savingsAccount.viewBalance();
+
+        CheckingAccount checkingAccountLowBalance = new CheckingAccount("C456", 400);
+        checkingAccountLowBalance.viewBalance();
+        checkingAccountLowBalance.withdraw(100);
+        checkingAccountLowBalance.viewBalance();
+    }
+}
+OUTPUT:
+Account Number: S123
+Account Type: Savings
+Balance: $1000.0
+Deposited: $500.0
+Account Number: S123
+Account Type: Savings
+Balance: $1500.0
+Account Number: C123
+Account Type: Checking
+Balance: $600.0
+Withdrew: $200.0
+Balance below minimum. Fee charged: $50.0
+Account Number: C123
+Account Type: Checking
+Balance: $350.0
+Monthly interest applied
+Account Number: S123
+Account Type: Savings
+Balance: $1560.0
+Account Number: C456
+Account Type: Checking
+Balance: $400.0
+Withdrew: $100.0
+Balance below minimum. Fee charged: $50.0
+Account Number: C456
+Account Type: Checking
+Balance: $250.0
+
